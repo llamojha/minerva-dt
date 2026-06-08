@@ -1,0 +1,52 @@
+:root {
+  /* ============================================================
+     RADII — restrained. The brand is sharp/editorial; corners are
+     small. Pills only for mono tags & buttons.
+     ============================================================ */
+  --radius-xs:  3px;
+  --radius-sm:  5px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  18px;
+  --radius-pill: 999px;
+
+  /* ============================================================
+     SHADOWS — on a near-black canvas, depth is mostly borders +
+     a soft cast shadow + the occasional gold glow.
+     ============================================================ */
+  --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:  0 6px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lg:  0 20px 50px rgba(0, 0, 0, 0.55);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Gold glow — for the focal accent (active node, primary button hover) */
+  --glow-gold:  0 0 0 1px rgba(255, 214, 102, 0.35), 0 8px 30px rgba(255, 214, 102, 0.18);
+  --glow-teal:  0 0 16px rgba(61, 214, 196, 0.45);
+
+  /* ============================================================
+     BORDERS
+     ============================================================ */
+  --border-width: 1px;
+  --hairline: 1px solid var(--border-subtle);
+  --rule: 1px solid var(--border-default);
+
+  /* ============================================================
+     MOTION — subtle, fast, eased. No bounce. Fades + small rises.
+     ============================================================ */
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1); /* @kind other */
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+  --dur-fast:   140ms; /* @kind other */
+  --dur-base:   240ms; /* @kind other */
+  --dur-slow:   480ms; /* @kind other */
+  --dur-ambient: 6s; /* @kind other */
+
+  /* ============================================================
+     BACKDROP / GLASS
+     ============================================================ */
+  --blur-glass: saturate(140%) blur(14px); /* @kind other */
+  --glass-fill: rgba(8, 12, 22, 0.72); /* @kind color */
+
+  /* Signature background washes */
+  --wash-vignette: radial-gradient(120% 120% at 50% 0%, rgba(17, 26, 45, 0.55) 0%, rgba(6, 9, 15, 0) 55%); /* @kind other */
+  --wash-gold-glow: radial-gradient(40% 50% at 30% 80%, rgba(255, 214, 102, 0.10) 0%, rgba(6, 9, 15, 0) 70%); /* @kind other */
+}

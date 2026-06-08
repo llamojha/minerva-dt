@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <title>Minerva — EventSource seam check</title>
+  <style>
+    body { background:#080C16; color:#cdd6e4; font:13px/1.5 ui-monospace,monospace; padding:24px; }
+    h1 { color:#FFD666; font-size:14px; letter-spacing:.18em; text-transform:uppercase; }
+    .ok { color:#3DD6C4; } .err { color:#ff6b6b; }
+    .ev { padding:2px 0; border-bottom:1px solid rgba(255,255,255,.06); }
+    .t { color:#FFD666; }
+  </style>
+</head>
+<body>
+  <h1>EventSource seam check</h1>
+  <p>POSTs an objective, then streams its events over a real <code>EventSource</code> against
+     <span id="api"></span> (cross-origin → exercises CORS + SSE framing). Append <code>?speed=0</code>
+     in code for instant replay.</p>
+  <div id="status">connecting…</div>
+  <div id="log"></div>
+
+  <script>
+    // Same-origin /api by default (one-server `npm run dev`); override base with ?api=http://host:port
+    const API = (new URLSearchParams(location.search).get('api') || '') + '/api';
+    const SPEED = new URLSearchParams(location.search).get('speed') ?? '0';
+    document.getElementById('api').textContent = API;
+    const log = document.getElementById('log');
+    const status = document.getElementById('status');
+    const line = (html, cls) => {
+      const d = document.createElement('div');
+      d.className = 'ev ' + (cls || '');
+      d.innerHTML = html;
+      log.appendChild(d);
+    };
+
+    (async () => {
+      try {
+        const res = await fetch(API + '/objectives', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ kind: 'improve-performance', statement: 'Improve performance this quarter' }),
+        });
+        if (res.status !== 201) throw new Error('POST /objectives → ' + res.status);
+        const { runId } = await res.json();
+        line('POST /objectives → <span class="ok">201</span> runId=<b>' + runId + '</b>');
+
+        let count = 0;
+        const es = new EventSource(API + '/objectives/' + runId + '/events?speed=' + SPEED);
+        es.onmessage = (m) => {
+          const ev = JSON.parse(m.data);
+          count++;
+          line('<span class="t">#' + ev.seq + '</span> ' + ev.type +
+               (ev.stepId ? ' · ' + ev.stepId : '') +
+               (ev.opportunity ? ' · ' + ev.opportunity.id : '') +
+               (ev.rankedOpportunityIds ? ' · [' + ev.rankedOpportunityIds.join(', ') + ']' : ''));
+          if (ev.type === 'run.completed') {
+            es.close();
+            status.innerHTML = '<span class="ok">✓ stream complete — ' + count +
+              ' events via EventSource, CORS + framing OK</span>';
+          }
+        };
+        es.onerror = () => {
+          // EventSource fires onerror on normal close too; only flag if we never finished.
+          if (count === 0) { status.innerHTML = '<span class="err">✗ EventSource error (CORS? server down?)</span>'; }
+        };
+      } catch (e) {
+        status.innerHTML = '<span class="err">✗ ' + e.message + '</span>';
+      }
+    })();
+  </script>
+</body>
+</html>

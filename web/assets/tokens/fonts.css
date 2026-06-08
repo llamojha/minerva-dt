@@ -1,0 +1,6 @@
+/* Webfonts — loaded from Google Fonts CDN.
+   NOTE: these are best-guess matches for the live site's typefaces
+   (Playfair Display for the Didone display, a neutral grotesque for body,
+   a mono for technical labels). Swap the @import + --font-* tokens if the
+   real binaries become available. */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,500;1,600;1,700&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");

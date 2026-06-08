@@ -1,0 +1,85 @@
+:root {
+  /* ============================================================
+     BASE PALETTE
+     A deep navy-black canvas with a single warm gold accent and a
+     cool teal "constellation" signal colour. Cool background, warm
+     focal point — the whole system lives on this tension.
+     ============================================================ */
+
+  /* Ink / backgrounds — near-black navy, very slightly blue */
+  --ink-900: #06090F; /* deepest — page edges / vignette */
+  --ink-800: #080C16; /* base canvas */
+  --ink-700: #0B1120; /* raised canvas */
+  --ink-600: #111A2D; /* card surface */
+  --ink-500: #18243B; /* hover surface / inset */
+  --ink-400: #243353; /* subtle borders on dark */
+
+  /* Neutrals / text on dark */
+  --white: #FFFFFF;
+  --slate-100: #E6EBF2; /* near-white text */
+  --slate-200: #C2CCDA; /* body text */
+  --slate-300: #9AA6B8; /* secondary text */
+  --slate-400: #6E7A8E; /* muted / captions */
+  --slate-500: #4E5872; /* faint / footer */
+
+  /* Gold — the brand accent (theme-color #FFD666) */
+  --gold-100: #FFF1C4; /* pale tint */
+  --gold-300: #FFE38A; /* highlight */
+  --gold-500: #FFD666; /* PRIMARY accent */
+  --gold-600: #F2C14E; /* italic role text / pressed */
+  --gold-700: #D6A537; /* deep / borders */
+
+  /* Teal — the constellation / network signal */
+  --teal-300: #5FE3D2;
+  --teal-500: #3DD6C4; /* node dots */
+  --teal-700: #1F6E66; /* dim network lines */
+
+  /* Semantic status */
+  --success: #4ECB8E;
+  --warning: #FFD666;
+  --danger:  #F2657A;
+  --info:    #5FB4E3;
+
+  /* ============================================================
+     SEMANTIC ALIASES — author UIs against these.
+     ============================================================ */
+
+  /* Surfaces */
+  --surface-page:    var(--ink-800);
+  --surface-page-deep: var(--ink-900);
+  --surface-raised:  var(--ink-700);
+  --surface-card:    var(--ink-600);
+  --surface-inset:   var(--ink-500);
+  --surface-hover:   var(--ink-500);
+
+  /* Text */
+  --text-display:    var(--white);
+  --text-heading:    var(--slate-100);
+  --text-body:       var(--slate-200);
+  --text-secondary:  var(--slate-300);
+  --text-muted:      var(--slate-400);
+  --text-faint:      var(--slate-500);
+  --text-accent:     var(--gold-500);
+  --text-accent-deep: var(--gold-600);
+
+  /* Lines & borders */
+  --border-subtle:   rgba(255, 255, 255, 0.07);
+  --border-default:  rgba(255, 255, 255, 0.12);
+  --border-strong:   rgba(255, 255, 255, 0.20);
+  --border-accent:   rgba(255, 214, 102, 0.45);
+
+  /* Accent system */
+  --accent:          var(--gold-500);
+  --accent-hover:    var(--gold-300);
+  --accent-press:    var(--gold-600);
+  --accent-contrast: var(--ink-900); /* text/icon on a gold fill */
+  --accent-soft:     rgba(255, 214, 102, 0.12); /* tinted fill */
+
+  /* Network / decorative */
+  --constellation-node: var(--teal-500);
+  --constellation-line: rgba(61, 214, 196, 0.16);
+  --constellation-gold: rgba(255, 214, 102, 0.30);
+
+  /* Focus ring */
+  --focus-ring: rgba(255, 214, 102, 0.55);
+}

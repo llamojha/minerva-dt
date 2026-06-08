@@ -1,0 +1,20 @@
+{
+  "name": "checkout-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Minerva demo — checkout service with a planted DB hotspot",
+  "scripts": {
+    "start": "tsx server.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "1.19.14",
+    "hono": "4.12.23",
+    "pg": "8.13.1",
+    "tsx": "4.19.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.17",
+    "@types/pg": "8.11.10"
+  }
+}

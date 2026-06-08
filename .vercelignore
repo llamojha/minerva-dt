@@ -1,0 +1,11 @@
+# Keep the Vercel deploy lean: ship only what the app needs (web/, api/, src/→dist, fixtures/).
+video
+demo-app
+gen
+.agents
+.claude
+docs
+.kiro
+*.log
+.env
+.env.*

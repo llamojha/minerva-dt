@@ -1,0 +1,52 @@
+# Minerva demo stack. Run on a Linux VM that already has OneAgent installed on the
+# host — OneAgent auto-instruments these containers (Node runtime + pg client spans),
+# so no in-app SDK is needed.
+#
+#   ORDERS_ROWS=3000000 docker compose up -d --build
+#
+# Tune ORDERS_ROWS up if /pay p95 is below the ~4s hero target, down if seeding drags.
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: minerva
+      POSTGRES_PASSWORD: minerva
+      POSTGRES_DB: minerva
+      # seed.sh threads ORDERS_ROWS through to init.sql; defaults to 3,000,000.
+      ORDERS_ROWS: "${ORDERS_ROWS:-3000000}"
+    command: >
+      postgres -c shared_buffers=256MB -c work_mem=64MB
+    volumes:
+      - ./db/seed.sh:/docker-entrypoint-initdb.d/seed.sh:ro
+      - ./db/init.sql:/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U minerva"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  checkout:
+    build: ./checkout
+    environment:
+      PGHOST: db
+      PGUSER: minerva
+      PGPASSWORD: minerva
+      PGDATABASE: minerva
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  traffic:
+    image: alpine:3.20
+    volumes:
+      - ./traffic/generate.sh:/generate.sh:ro
+    command: ["sh", "/generate.sh"]
+    environment:
+      TARGET: http://checkout:8080
+      PAY_CONCURRENCY: "4"
+    depends_on:
+      - checkout
