@@ -64,6 +64,17 @@ function parseMcpResult(result: unknown): { rows: unknown; rowCount: number; gra
     typeof v === 'object' && v !== null ? (v as Record<string, unknown>) : undefined;
 
   const top = asRec(result);
+  // Dynatrace MCP server (≥1.8): rows live in _meta.records, scan cost in _meta.scannedBytes;
+  // content[].text is a markdown narrative, not parseable JSON.
+  const mcpMeta = asRec(top?._meta);
+  if (mcpMeta && Array.isArray(mcpMeta.records)) {
+    const scanned = Number(mcpMeta.scannedBytes ?? 0);
+    return {
+      rows: mcpMeta.records,
+      rowCount: mcpMeta.records.length,
+      grailGb: scanned > 0 ? scanned / 1e9 : 0,
+    };
+  }
   const content = top?.content;
   if (Array.isArray(content)) {
     const text = content.map((c) => asRec(c)?.text).find((t) => typeof t === 'string') as string | undefined;

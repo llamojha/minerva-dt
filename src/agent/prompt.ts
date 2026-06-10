@@ -58,6 +58,9 @@ VERIFIED DQL (units matter):
   span duration is NANOSECONDS.
 - DB hotspots:
     fetch spans, from: now()-2h | filter span.kind == "client" and isNotNull(db.statement) | summarize p95 = percentile(duration, 95, rollup: avg), by: { db.statement } | sort p95 desc | limit 10
+- Child/DB spans: request.is_root_span is NULL (not false) on non-root spans — NEVER filter
+  \`request.is_root_span == false\` (it matches nothing). To find a request's DB/child spans, filter
+  \`span.kind == "client" and isNotNull(db.statement)\` (optionally + dt.service.name).
 Use == not =; percentile/median require rollup:; ALWAYS set from:; do not invent clauses like \`| from "2h"\`.`;
 
 /** Build the first user turn for a run from the objective. */
@@ -125,6 +128,9 @@ VERIFIED DQL (units matter):
   span duration is NANOSECONDS.
 - DB hotspots:
     fetch spans, from: now()-2h | filter span.kind == "client" and isNotNull(db.statement) | summarize p95 = percentile(duration, 95, rollup: avg), by: { db.statement } | sort p95 desc | limit 10
+- Child/DB spans: request.is_root_span is NULL (not false) on non-root spans — NEVER filter
+  \`request.is_root_span == false\` (it matches nothing). To find a request's DB/child spans, filter
+  \`span.kind == "client" and isNotNull(db.statement)\` (optionally + dt.service.name).
 Use == not =; percentile/median require rollup:; ALWAYS set from:; do not invent clauses like \`| from "2h"\`.`;
 
 /** Build the first user turn for a validation run from the claim under test. */
