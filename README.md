@@ -1,8 +1,10 @@
 # Minerva
 
-**You bring the goal. Minerva finds the wisest move, proven by your data.**
+**You bring the goal. Minerva finds the wisest move — decided by your data, never opinion.**
 
-Minerva is an objective-driven optimization agent. You state an engineering goal — *"improve
+Minerva is a fully data-driven, objective-driven optimization agent. Every decision it makes —
+which opportunity to surface, which task to recommend, how much payoff to project — is made with
+data from Dynatrace. You state an engineering goal — *"improve
 performance," "cut cost," "reduce errors"* — and Minerva autonomously investigates your Dynatrace
 data, finds the highest-leverage opportunities, quantifies the payoff with evidence, and turns the
 chosen opportunity into action.
@@ -33,10 +35,14 @@ You state a goal in plain language. Minerva decomposes it into an investigation 
 multi-step inquiry across Dynatrace (metrics, traces, database spans, problems, topology), and
 returns a **ranked board of opportunities** — each a concrete finding with the data that proves
 it, an estimated payoff, an effort estimate, and a recommended action. Then it turns the
-opportunity you choose into a durable artifact.
+opportunity you choose into a durable artifact: a new task is never a blank ticket — it arrives
+populated with the Dynatrace evidence, queries, and quantified payoff behind it.
 
 ## What Makes It Different
 
+- **Fully data-driven** — all decisions are made with data. Whether you're picking the next
+  thing to try or validating a task you already had in mind, the answer is populated with data
+  from Dynatrace, not opinion.
 - **Objective-driven, not metric-driven** — the unit of interaction is a *goal*; the output is a
   *ranked action with justification*.
 - **It does the analysis, not just the query** — it plans, branches, correlates across services,

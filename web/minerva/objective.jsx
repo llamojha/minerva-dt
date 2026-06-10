@@ -22,7 +22,7 @@ function DiscoveryPanel({ layout, onDiscovery }) {
         <div className="lane-head">
           <div className="lane-tag"><span className="ltr">A</span> Discovery</div>
           <h2>Find the move</h2>
-          <p>Set an objective. Minerva investigates and ranks where the leverage actually is.</p>
+          <p>Set an objective. Minerva interrogates your Dynatrace data and ranks where the leverage actually is.</p>
         </div>
       )}
 
@@ -154,16 +154,16 @@ function ObjectivePicker({ layout, onDiscovery, onValidate }) {
         <div className="obj-hero">
           <OwlMark className="owl-lg" size={60} />
           <div className="eyebrow" style={{ marginBottom: "1rem" }}>
-            <span className="lead">—</span>OBJECTIVE-DRIVEN OPTIMISATION AGENT
+            <span className="lead">—</span>DATA-DRIVEN OPTIMISATION AGENT
           </div>
           <h1>Minerva</h1>
           <p className="tagline">
-            You bring the goal — or the hunch. Minerva returns the <em>wisest move</em>, proven by your data.
+            You bring the goal — or the hunch. Minerva returns the <em>wisest move</em>, decided by your Dynatrace data — never opinion.
           </p>
           <div className="promise-strip">
             <span className="k">Two ways in</span>
             <span className="d">·</span>
-            <span className="t">both end in an <b>evidence-backed, data-driven decision</b></span>
+            <span className="t">both end in a <b>data-driven decision</b>, populated with Dynatrace evidence</span>
           </div>
         </div>
 

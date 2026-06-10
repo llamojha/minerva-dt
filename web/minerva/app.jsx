@@ -164,7 +164,7 @@ function ActionModal({ action, onClose }) {
                 <h4>{isTicket ? "Ticket opened" : "Notebook exported"}</h4>
                 <p style={{ marginTop: 6 }}>
                   {isTicket
-                    ? "Created with the finding, evidence queries and recommended action attached."
+                    ? "Populated with the finding, Dynatrace evidence queries and recommended action — the data travels with the task."
                     : "Created with the before→after projection and source DQL — ready to share."}
                 </p>
               </div>

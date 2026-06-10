@@ -114,7 +114,7 @@ function ActionSuccess({ artifact }) {
         <h4>{artifact.type === "ticket" ? "Ticket opened" : "Notebook exported"}</h4>
         <p>
           {artifact.type === "ticket"
-            ? "A ticket was created with the finding, evidence queries, and the recommended action attached."
+            ? "The ticket arrives populated with the finding, the Dynatrace evidence queries, and the recommended action — the data travels with the task."
             : "A Dynatrace notebook was created with the before→after projection and the source DQL, ready to share."}
         </p>
       </div>

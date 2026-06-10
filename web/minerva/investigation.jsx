@@ -101,7 +101,7 @@ function InvestigationStream({ objective, mode, task, steps, progress, planArriv
                   ) : (
                     <React.Fragment>
                       <div className="big">Found <b>{oppCount} high-leverage</b> {oppCount === 1 ? "opportunity" : "opportunities"}.</div>
-                      <div className="small">Ranked by impact × effort, each backed by the queries above.</div>
+                      <div className="small">Ranked by impact × effort — every task populated with the Dynatrace data above.</div>
                     </React.Fragment>
                   )}
                 </div>

@@ -83,10 +83,10 @@ function OpportunityBoard({ opportunities, onOpenQuery, onOpenDetail, onAction }
         <div className="board-head">
           <div>
             <div className="eyebrow"><span className="lead">—</span>OPPORTUNITY BOARD · 003</div>
-            <h2>The wisest moves, ranked</h2>
+            <h2>The wisest moves, ranked by your data</h2>
           </div>
           <div className="sort">
-            <Icon name="sliders" size={15} /> sorted by <b>impact × effort</b>
+            <Icon name="sliders" size={15} /> sorted by <b>impact × effort</b>, measured from Dynatrace data
           </div>
         </div>
 
