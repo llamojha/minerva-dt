@@ -1,6 +1,6 @@
 // Minerva — the single agent definition (M3).
 //
-// One LlmAgent (Gemini 2.5 Pro) with the system prompt and the local emitter tools. The Dynatrace
+// One LlmAgent (Gemini 2.5 Flash) with the system prompt and the local emitter tools. The Dynatrace
 // MCP toolset is consumed *inside* the run_query tool (see tools.ts), not exposed to the model
 // directly, so every step event carries a clean stepId. This is one agent — no sub-agents.
 

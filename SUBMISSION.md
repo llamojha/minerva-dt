@@ -10,7 +10,7 @@ Google Cloud Rapid Agent Hackathon, Dynatrace track.
 
 ## Elevator pitch
 
-Bring a goal and Minerva finds the move. Bring a task and it proves it. Either way, you leave data driven.
+An agent that turns engineering goals into evidence-backed decisions — it investigates Dynatrace production data, ranks the highest-impact actions, and validates planned work against real telemetry.
 
 ## Summary
 
@@ -53,6 +53,121 @@ Minerva is a single Gemini agent, not a multi agent stack. One model, one system
 - **The frontend** is a three screen experience (picker, live investigation stream, board or verdict) in a calm, editorial instrument panel aesthetic.
 - **The act path** writes a Dynatrace notebook document for the chosen opportunity or verdict.
 - **The video** is a programmatic Remotion walkthrough built from real screenshots of the running app.
+
+## Under the hood: ADK + the Dynatrace MCP server, in code
+
+### 1. The agent is one ADK `LlmAgent`
+
+The whole agent is a single Gemini-powered `LlmAgent` from the Google Agent Development Kit — one model, one system prompt, one set of tools. No orchestrator layer, no sub-agents:
+
+```ts
+// src/agent/index.ts
+import { LlmAgent, type FunctionTool } from '@google/adk';
+import { MODEL, SYSTEM_PROMPT } from './prompt.js';   // MODEL = 'gemini-2.5-flash'
+
+export function buildMinervaAgent({ tools, instruction = SYSTEM_PROMPT }: MinervaAgentDeps): LlmAgent {
+  return new LlmAgent({
+    name: 'minerva',
+    description: 'Objective-driven optimization analyst over Dynatrace runtime data.',
+    model: MODEL,
+    instruction,   // discovery's SYSTEM_PROMPT, or VALIDATION_PROMPT in validation mode
+    tools,
+  });
+}
+```
+
+The same agent serves both modes: Discovery and Validation differ only in the instruction and which terminal tools the model receives (`add_opportunity`/`finalize_board` vs `emit_verdict`).
+
+### 2. Wiring the Dynatrace MCP server into ADK
+
+The official `@dynatrace-oss/dynatrace-mcp-server` runs as a child process over stdio, wrapped in ADK's `MCPToolset`. Configuration is just the tenant URL, a platform token, and a hard Grail scan budget the MCP server enforces:
+
+```ts
+// src/dynatrace/index.ts
+import { MCPToolset } from '@google/adk';
+
+export function createDynatraceToolset(config = loadDynatraceConfig()): MCPToolset {
+  return new MCPToolset({
+    type: 'StdioConnectionParams',
+    serverParams: {
+      command: 'npx',
+      args: ['-y', '@dynatrace-oss/dynatrace-mcp-server'],
+      env: {
+        ...process.env,
+        DT_ENVIRONMENT: config.environment,            // https://<tenant>.apps.dynatrace.com
+        DT_PLATFORM_TOKEN: config.platformToken,        // dt0s16… platform token
+        DT_GRAIL_QUERY_BUDGET_GB: String(config.grailBudgetGb),  // hard cost ceiling
+      },
+    },
+  });
+}
+```
+
+### 3. Which MCP tools we use
+
+The Dynatrace MCP server exposes ~20 tools. Minerva's read path uses exactly one — **`execute_dql`** — because the entire investigation is expressed as DQL over Grail (spans, `dt.service.request.*` metrics, DB statement spans, deployment events, Davis problems). The runner discovers it from the live toolset at startup:
+
+```ts
+// src/agent/run.ts
+const toolset = createDynatraceToolset();
+const all = await toolset.getTools();
+const executeDql = all.find((t) => t.name === 'execute_dql');
+if (!executeDql) throw new Error(`execute_dql not found; available: ${all.map((t) => t.name).join(', ')}`);
+```
+
+(The "act" path — exporting a finding as a Dynatrace notebook — writes through `dtctl`, the Dynatrace CLI, keeping the MCP integration a pure read/sense path under the agent's control while the write stays user-triggered.)
+
+### 4. How the agent actually looks for information
+
+We deliberately do **not** hand `execute_dql` to the model raw. It's wrapped in a local `run_query` tool that (a) lints every query with a cost guard, (b) executes through the MCP server, (c) emits a contract-valid `step.completed` event for the live UI stream, and (d) returns the rows *plus the guard warnings* to the model so it can self-correct:
+
+```ts
+// src/agent/tools.ts
+const runQuery = new FunctionTool({
+  name: 'run_query',
+  description: 'Execute one scoped, cost-aware DQL query against Dynatrace and return its rows. ' +
+    'Tag it with the plan stepId it advances. Always include from:, a filter, and limit.',
+  parameters: runQuerySchema,                    // { stepId, label, dql }
+  execute: async (input, toolContext) => {
+    const { stepId, label, dql } = input;
+    const guarded = guardDql(dql);               // lints from:/filter/limit — never rewrites
+    emit({ type: 'step.started', stepId });
+    const result = await executeDql.runAsync({ args: { [argKey]: guarded.dql }, toolContext });
+    const { rows, rowCount, grailGb } = parseMcpResult(result);   // rows from _meta.records,
+    stats.queryCount += 1;                                        // cost from _meta.scannedBytes
+    stats.grailGbScanned += grailGb;
+    emit({ type: 'step.completed', stepId, dql: guarded.dql,
+           resultSummary: `${label}: ${rowCount} rows`, durationMs, rowCount });
+    return { rows, rowCount, warnings: guarded.warnings };        // model sees rows + warnings
+  },
+});
+```
+
+The model authors the DQL itself, guided by verified patterns in the system prompt. A typical step it runs while isolating the database hotspot:
+
+```sql
+fetch spans, from: now()-30m
+| filter span.kind == "client" and isNotNull(db.statement)
+| summarize p95_ns = percentile(duration, 95, rollup: avg), calls = count(), by: { db.statement }
+| fieldsAdd p95_ms = p95_ns / 1000000
+| sort p95_ns desc
+| limit 10
+```
+
+This is the query that surfaces the hero finding: the unindexed `SELECT * FROM orders WHERE lower(email) = …` dominating checkout `/pay` p95.
+
+All of the agent's *structured* output flows the same way — `emit_plan`, `add_opportunity`, `finalize_board`, `emit_verdict`, and `note_insufficient_data` are typed ADK `FunctionTool`s whose side-effect is emitting a contract event onto the SSE stream. The model never produces free text we have to parse, and when the data can't support a conclusion it must call `note_insufficient_data` rather than fabricate.
+
+```text
+Gemini 2.5 Flash (LlmAgent)
+   │  tool call: run_query({ stepId, label, dql })
+   ▼
+guardDql lint ──▶ Dynatrace MCP server (execute_dql) ──▶ Grail
+   │                         │
+   │   rows + scan cost ◀────┘
+   ▼
+step.completed event ──▶ SSE stream ──▶ live investigation UI
+```
 
 ## Data sources
 

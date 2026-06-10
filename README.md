@@ -2,12 +2,20 @@
 
 **You bring the goal. Minerva finds the wisest move — decided by your data, never opinion.**
 
+- **Live demo:** https://minerva-dynatrace.vercel.app
+- Built for the [Google Cloud Rapid Agent Hackathon](https://rapid-agent.devpost.com/) — Dynatrace track
+
 Minerva is a fully data-driven, objective-driven optimization agent. Every decision it makes —
 which opportunity to surface, which task to recommend, how much payoff to project — is made with
-data from Dynatrace. You state an engineering goal — *"improve
-performance," "cut cost," "reduce errors"* — and Minerva autonomously investigates your Dynatrace
-data, finds the highest-leverage opportunities, quantifies the payoff with evidence, and turns the
-chosen opportunity into action.
+data from Dynatrace. It has two entry modes sharing one engine:
+
+- **Discovery — find the move.** You state an engineering goal — *"improve performance"* — and
+  Minerva autonomously investigates your Dynatrace data, finds the highest-leverage opportunities,
+  quantifies the payoff with evidence, and turns the chosen opportunity into action.
+- **Validation — prove the task.** You describe a task or hunch — *"add an index to
+  orders.email"* — and Minerva decides what evidence would confirm or refute it, runs the queries,
+  and returns one decisive verdict: **Confirmed**, **Refuted**, or **Inconclusive**. When it
+  refutes, it redirects you to what actually matters.
 
 > Decision intelligence for engineering, grounded in runtime truth.
 
@@ -53,7 +61,7 @@ populated with the Dynatrace evidence, queries, and quantified payoff behind it.
 
 ## Architecture
 
-Minerva is a **single optimization agent** (one Gemini 2.5 Pro `LlmAgent`) that, given an
+Minerva is a **single optimization agent** (one Gemini 2.5 Flash `LlmAgent`) that, given an
 objective, autonomously runs a multi-step, branching investigation over Dynatrace and
 synthesizes the evidence into a ranked recommendation. The MVP targets one objective —
 **Improve Performance** — with Cost, Reliability, and Scale objectives to follow.
@@ -62,7 +70,7 @@ Dynatrace is both the **source** (Grail data the agent reasons over) and a **sin
 own OTel telemetry + the notebooks it writes).
 
 ```
-React/Vite web app  ──▶  Minerva agent (TypeScript · @google/adk · Gemini 2.5 Pro)
+React web app (SSE)  ──▶  Minerva agent (TypeScript · @google/adk · Gemini 2.5 Flash)
                             ├─ Dynatrace MCP server   (reads: execute_dql, problems, …)
                             ├─ dtctl                  (writes: notebook / dashboard)
                             └─ impact_estimator       (quantify payoff)
@@ -75,12 +83,13 @@ React/Vite web app  ──▶  Minerva agent (TypeScript · @google/adk · Gemin
 
 | Component | Technology |
 |-----------|-----------|
-| Agent model | Gemini 2.5 Pro |
+| Agent model | Gemini 2.5 Flash |
 | Orchestration | Google ADK (TypeScript, `@google/adk`) |
 | Runtime source (reads) | Dynatrace MCP Server |
 | Action layer (writes) | `dtctl` (Dynatrace CLI) |
 | Self-observability | OpenTelemetry → Dynatrace (OTLP) |
-| Frontend | React + Vite + TypeScript |
+| Transport | Hono REST + Server-Sent Events (Node locally, Vercel function in prod) |
+| Frontend | React (build-free, CDN + in-browser Babel) |
 
 ## Documentation
 
@@ -100,16 +109,24 @@ The authoritative specs live in [`docs/minerva/`](docs/minerva/):
 ### Prerequisites
 
 - Node.js 20+ (agent + web frontend)
-- Google Cloud account with Vertex AI access (Gemini 2.5 Pro)
+- A Gemini API key (Google AI Studio) on a Google Cloud project
 - Dynatrace environment with API access (a free trial tenant works)
-- `dtctl` installed and authenticated (`dtctl auth login`)
+- `dtctl` installed and authenticated (`dtctl auth login`) — only needed for notebook export
 
 ### Setup
 
 ```bash
-# Configure environment
+npm install
+
+# Configure environment (only needed for live-agent mode and export)
 cp .env.example .env
 # Edit .env with your Dynatrace and Google Cloud credentials
+
+# Fixture-backed demo (no credentials needed) — site + API on one origin
+npm run dev          # http://localhost:8787
+
+# Live agent against a real tenant (requires .env + seeded data, see demo-app/)
+npm run dev:live
 ```
 
 ### Environment Variables
@@ -123,21 +140,31 @@ GEMINI_API_KEY=your-gemini-key
 
 ## Demo
 
-The demo shows one objective end to end:
+**Discovery**, end to end:
 
 1. **Set the goal** — user picks "Improve Performance"
 2. **The agent investigates** — a visible plan executes step by step across Dynatrace (rank
    services by latency → drill slow endpoints → spans → DB hotspots → correlate deploys)
 3. **The payoff** — a ranked opportunity board sorted by impact × effort, each card with source
    DQL, projected before→after, confidence, and dissent
-4. **The signature visual** — the "Leverage Map" (impact vs effort) highlights "pull these"
-5. **Act** — export the chosen opportunity as a Dynatrace notebook via `dtctl`
+4. **Act** — export the chosen opportunity as a Dynatrace notebook
 
 Hero opportunity: *"checkout /pay — 65% of p95 is one unindexed DB query"* → p95 4.2s → 1.5s (−64%).
+
+**Validation**, the reverse direction: validate the task *"Add an index to orders.email"* → Minerva
+runs the confirm/refute queries and returns **Refuted** (that lookup is ~4% of `/pay` latency),
+then redirects to the query that actually dominates — the task is invalidated, but the decision
+stays data-driven.
+
+The hosted demo replays recorded fixtures captured from real agent runs (the trial tenant expires
+during judging); the live agent path (`npm run dev:live`) runs the same engine against a real
+tenant.
 
 ## Hackathon
 
 Built for the [Google Cloud Rapid Agent Hackathon](https://rapid-agent.devpost.com/) — Dynatrace Track.
+Rules and compliance checklist: [hackathon-rules.md](hackathon-rules.md) ·
+Submission text: [SUBMISSION.md](SUBMISSION.md)
 
 ## License
 

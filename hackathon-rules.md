@@ -107,7 +107,7 @@ A functional agent — powered by **Gemini** and **Google Cloud Agent Builder** 
 
 | Requirement | Minerva Status |
 |-------------|-------------|
-| Gemini-powered agent | ✅ Gemini 2.5 Pro for planning, investigation, and synthesis |
+| Gemini-powered agent | ✅ Gemini 2.5 Flash for planning, investigation, and synthesis |
 | Google Cloud Agent Builder | ✅ Orchestration platform (ADK / Agent Engine) |
 | Dynatrace MCP integration | ✅ Runtime evidence source (reads) + dtctl/OTel write-back |
 | Multi-step task execution | ✅ Objective → plan → investigate → rank → prove → act |

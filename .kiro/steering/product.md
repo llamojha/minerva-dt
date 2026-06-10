@@ -28,11 +28,11 @@ in minutes, with a defensible, sourced recommendation, instead of days of manual
 3. **It does the analysis, not just the query** — it plans, branches, correlates, and ranks by impact-to-effort
 4. **Every claim is sourced** — each finding links to the exact DQL and result; confidence is calibrated; the contrary evidence (dissent) is always shown
 5. **It acts** — the chosen opportunity becomes a Dynatrace notebook / ticket / PR, not a chat message
-6. **A single agent that does the whole loop** — one Gemini 2.5 Pro agent plans, branches, ranks, and synthesizes; "multi-step" is the branching investigation within the task, not multiple agents
+6. **A single agent that does the whole loop** — one Gemini 2.5 Flash agent plans, branches, ranks, and synthesizes; "multi-step" is the branching investigation within the task, not multiple agents
 
 ## Architecture framing
 
-Minerva = a **single optimization agent** (one Gemini 2.5 Pro `LlmAgent`, one system prompt) that
+Minerva = a **single optimization agent** (one Gemini 2.5 Flash `LlmAgent`, one system prompt) that
 runs a multi-step, branching investigation and synthesizes a ranked recommendation. MVP targets
 **one objective, Improve Performance**; post-MVP adds more objectives (Cost, Reliability, Scale).
 Per-objective specialist sub-agents are a post-MVP possibility only — not the MVP architecture.

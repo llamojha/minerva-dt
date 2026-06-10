@@ -13,7 +13,7 @@
 ┌──────────────────────────────────────────────────────────────┐
 │            Minerva Agent  (TypeScript · @google/adk · Gemini)    │
 │                                                                │
-│   Single LlmAgent (Gemini 2.5 Pro)                             │
+│   Single LlmAgent (Gemini 2.5 Flash)                             │
 │     ├─ states plan · runs investigation loop · ranks · emits   │
 │     └─ tools:                                                   │
 │         • Dynatrace MCP  (reads: execute_dql, problems, …)     │
@@ -45,7 +45,7 @@ agent's own OTel telemetry + the notebooks it writes) — the dual integration j
   required hosted web URL.
 
 ### Minerva agent (TypeScript + @google/adk)
-- **Gemini 2.5 Pro** for planning, synthesis, and impact estimation (via `@google-cloud/vertexai`).
+- **Gemini 2.5 Flash** for planning, synthesis, and impact estimation (via `@google-cloud/vertexai`).
 - **Minerva is a single `LlmAgent`**, not a multi-agent system. One model, one system prompt
   (`04-agent-logic.md`), running the whole loop herself. "Multi-step" is the branching
   investigation *within* the task — not multiple agents. With MVP scope fixed to one objective
@@ -95,7 +95,7 @@ agent's own OTel telemetry + the notebooks it writes) — the dual integration j
 | Choice | Rationale |
 |---|---|
 | TypeScript + @google/adk | Official first-party TS ADK; shares the event-contract types with the React frontend; reuses existing TS tooling |
-| Gemini 2.5 Pro | Required by the track; strong planning/synthesis |
+| Gemini 2.5 Flash | Required by the track; strong planning/synthesis |
 | Dynatrace MCP server | Required partner integration; the read path |
 | dtctl | Clean, agent-friendly write path (`--agent` JSON, `dtctl commands` catalog) |
 | React/Vite | Fast to build a polished, streaming web UI |

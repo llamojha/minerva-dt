@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Minerva owl monogram (web/minerva OwlMark, weights bumped for 16px legibility) -->
+  <circle cx="24" cy="24" r="24" fill="#080C16"/>
+  <circle cx="24" cy="24" r="21" stroke="#CDD6E4" stroke-width="1.6" opacity="0.4" fill="none"/>
+  <path d="M13 20c0-6 5-10 11-10s11 4 11 10" stroke="#FFD666" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M15 13l3 3M33 13l-3 3" stroke="#CDD6E4" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+  <circle cx="18.5" cy="23" r="5" stroke="#CDD6E4" stroke-width="2" fill="none"/>
+  <circle cx="29.5" cy="23" r="5" stroke="#CDD6E4" stroke-width="2" fill="none"/>
+  <circle cx="18.5" cy="23" r="2.4" fill="#FFD666"/>
+  <circle cx="29.5" cy="23" r="2.4" fill="#FFD666"/>
+  <path d="M24 25.5l-2.4 3.6h4.8z" fill="#FFD666"/>
+  <path d="M19 33c1.5 1.5 3.2 2.2 5 2.2s3.5-.7 5-2.2" stroke="#CDD6E4" stroke-width="1.8" stroke-linecap="round" opacity="0.6" fill="none"/>
+</svg>

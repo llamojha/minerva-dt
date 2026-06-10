@@ -24,8 +24,8 @@ These are decisions made to unblock writing. Change them and the docs follow.
 | Decision | Choice | Rationale |
 |---|---|---|
 | **Name** | **Minerva** | Roman goddess of wisdom & strategy — the strategist who turns knowledge into the wisest move. Knowledge-driven, fits a data-first product; no AWS-Athena clash. |
-| **Architecture framing** | Minerva = a single optimization agent running a multi-step, branching investigation | One Gemini 2.5 Pro `LlmAgent`, one system prompt; "multi-step" is the branching investigation within the task, not multiple agents. MVP targets one objective (Performance); more objectives to follow. |
-| **Stack** | TypeScript + @google/adk, Gemini 2.5 Pro; React web frontend | Official first-party TS ADK; shares the event-contract types with the frontend (one source of truth) |
+| **Architecture framing** | Minerva = a single optimization agent running a multi-step, branching investigation | One Gemini 2.5 Flash `LlmAgent`, one system prompt; "multi-step" is the branching investigation within the task, not multiple agents. MVP targets one objective (Performance); more objectives to follow. |
+| **Stack** | TypeScript + @google/adk, Gemini 2.5 Flash; React web frontend | Official first-party TS ADK; shares the event-contract types with the frontend (one source of truth) |
 | **Hero objective (MVP)** | "Improve Performance" | Most visual, easiest to seed (RED + traces + DB spans) |
 | **Data** | Real Dynatrace trial tenant + seeded demo app | Mocked data risks failing the stage-one judging gate |
 | **Reads** | Dynatrace MCP server (`execute_dql`, problems, etc.) | Required partner integration |

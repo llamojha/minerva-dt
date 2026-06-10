@@ -5,7 +5,7 @@ verified DQL in [`../dynatrace-reference.md`](../dynatrace-reference.md).
 
 ## Agent identity
 
-**Name:** Minerva · **Model:** Gemini 2.5 Pro · **Role:** an objective-driven optimization
+**Name:** Minerva · **Model:** Gemini 2.5 Flash · **Role:** an objective-driven optimization
 analyst. Given an engineering goal, it autonomously investigates Dynatrace and returns the
 highest-leverage, evidence-backed opportunities to achieve it.
 

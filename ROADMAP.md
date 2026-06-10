@@ -107,12 +107,12 @@ The ground truth the demo depends on.
 The "it's an agent" core.
 
 > **One agent, not many.** `04-agent-logic.md` specifies a *single* agent (Minerva — one Gemini
-> 2.5 Pro, one system prompt) running the loop `PLAN → INVESTIGATE → ANALYZE & RANK → RECOMMEND →
+> 2.5 Flash, one system prompt) running the loop `PLAN → INVESTIGATE → ANALYZE & RANK → RECOMMEND →
 > ACT`. "Multi-step" is the branching investigation *within* the task, not multiple agents. With
 > MVP scope fixed to one objective (Performance), there is exactly one analyst → one agent. Sub-
 > agents (Cost/Errors specialists) are post-MVP only. No orchestrator layer, no delegation.
 
-- [ ] One ADK `LlmAgent` (Gemini 2.5 Pro) with the system prompt from `04-agent-logic.md` and
+- [ ] One ADK `LlmAgent` (Gemini 2.5 Flash) with the system prompt from `04-agent-logic.md` and
       the M1 toolset (`dt_execute_dql`) as its only tool.
 - [ ] A loop runner wrapping the agent: drives **plan → investigate (multi-step, branching) →
       analyze**, and emits M0 events at each beat (`plan.proposed`, `step.started/completed`, …)
