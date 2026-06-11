@@ -121,13 +121,19 @@ aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --
 docker build -t $ECR/minerva:latest .       # on Apple Silicon: docker build --platform linux/amd64 …
 docker push $ECR/minerva:latest
 
-# 2. Register the task definition (after substituting ACCOUNT_ID / REGION in the file)
+# 2. Create the CloudWatch log group the task definition logs to. The task def deliberately does
+#    NOT set awslogs-create-group — that would require logs:CreateLogGroup on the execution role,
+#    which the standard ecsTaskExecutionRole doesn't have, and the task would die during
+#    log-driver initialization before the app starts.
+aws logs create-log-group --log-group-name /ecs/minerva --region $AWS_REGION
+
+# 3. Register the task definition (after substituting ACCOUNT_ID / REGION in the file)
 aws ecs register-task-definition --cli-input-json file://deploy/ecs/task-definition.json
 
-# 3. Cluster
+# 4. Cluster
 aws ecs create-cluster --cluster-name minerva
 
-# 4. ALB + target group (target type MUST be `ip` for Fargate awsvpc networking)
+# 5. ALB + target group (target type MUST be `ip` for Fargate awsvpc networking)
 aws elbv2 create-target-group --name minerva --protocol HTTP --port 8787 \
   --vpc-id <vpc-id> --target-type ip \
   --health-check-path /api/health --health-check-interval-seconds 30
@@ -136,11 +142,11 @@ aws elbv2 create-load-balancer --name minerva --subnets <subnet-a> <subnet-b> \
 aws elbv2 create-listener --load-balancer-arn <alb-arn> --protocol HTTP --port 80 \
   --default-actions Type=forward,TargetGroupArn=<tg-arn>
 
-# 5. SSE: raise the ALB idle timeout above the longest investigation (default is 60s — too short)
+# 6. SSE: raise the ALB idle timeout above the longest investigation (default is 60s — too short)
 aws elbv2 modify-load-balancer-attributes --load-balancer-arn <alb-arn> \
   --attributes Key=idle_timeout.timeout_seconds,Value=3600
 
-# 6. Service (2 tasks; the app is stateless, no sticky sessions needed)
+# 7. Service (2 tasks; the app is stateless, no sticky sessions needed)
 aws ecs create-service --cluster minerva --service-name minerva \
   --task-definition minerva --desired-count 2 --launch-type FARGATE \
   --network-configuration "awsvpcConfiguration={subnets=[<subnet-a>,<subnet-b>],securityGroups=[<task-sg>],assignPublicIp=ENABLED}" \
@@ -191,3 +197,4 @@ Re-register the task definition and update the service
 | Live run fails immediately | Missing/wrong `DT_*` or Gemini env vars — check container logs |
 | Export returns "Demo mode" artifact | Expected: the image has no `dtctl` binary (see top of this doc) |
 | Image pull fails on the cluster | Registry auth — `imagePullSecrets` (K8s) / ECR permissions on the execution role (ECS) |
+| ECS task stops with `ResourceInitializationError: … awslogs … log group does not exist` | The `/ecs/minerva` log group wasn't created (walkthrough step 2) — create it, or grant `logs:CreateLogGroup` to the execution role and set `awslogs-create-group: "true"` |

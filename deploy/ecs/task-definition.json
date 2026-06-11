@@ -37,8 +37,7 @@
         "options": {
           "awslogs-group": "/ecs/minerva",
           "awslogs-region": "REGION",
-          "awslogs-stream-prefix": "minerva",
-          "awslogs-create-group": "true"
+          "awslogs-stream-prefix": "minerva"
         }
       }
     }
