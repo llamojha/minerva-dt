@@ -1,0 +1,46 @@
+{
+  "family": "minerva",
+  "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "awsvpc",
+  "cpu": "256",
+  "memory": "1024",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "minerva",
+      "image": "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/minerva:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8787,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "PORT", "value": "8787" },
+        { "name": "MINERVA_LIVE", "value": "0" },
+        { "name": "MINERVA_REPLAY_SPEED", "value": "1" }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget -qO- http://127.0.0.1:8787/api/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 10
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/minerva",
+          "awslogs-region": "REGION",
+          "awslogs-stream-prefix": "minerva",
+          "awslogs-create-group": "true"
+        }
+      }
+    }
+  ]
+}

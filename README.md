@@ -129,6 +129,19 @@ npm run dev          # http://localhost:8787
 npm run dev:live
 ```
 
+### Run with Docker
+
+```bash
+docker build -t minerva .
+docker run --rm -p 8787:8787 minerva                                      # fixture demo
+docker run --rm -p 8787:8787 --env-file .env -e MINERVA_LIVE=1 minerva    # live agent
+```
+
+See [`deploy/README.md`](deploy/README.md) for the full container guide, including deploying to
+**Kubernetes** ([manifests](deploy/k8s/minerva.yaml)) and **ECS Fargate**
+([task definition](deploy/ecs/task-definition.json)). For the serverless path, see
+[DEPLOY.md](DEPLOY.md) (Vercel).
+
 ### Environment Variables
 
 ```

@@ -1,0 +1,24 @@
+# Minerva — local container run.
+#
+#   docker compose up --build              # fixture demo on http://localhost:8787
+#   MINERVA_LIVE=1 docker compose up       # live agent (needs a populated .env)
+services:
+  minerva:
+    build: .
+    ports:
+      - "8787:8787"
+    environment:
+      # Fixture-backed by default; flip to 1 for the live agent against a real tenant.
+      MINERVA_LIVE: ${MINERVA_LIVE:-0}
+      # Optional: compress the fixture replay cadence (e.g. 3 = 3x faster).
+      MINERVA_REPLAY_SPEED: ${MINERVA_REPLAY_SPEED:-1}
+    # Live-mode credentials (DT_ENVIRONMENT, DT_PLATFORM_TOKEN, GOOGLE_CLOUD_PROJECT,
+    # GEMINI_API_KEY) come from .env — see .env.example. Harmless if absent in fixture mode.
+    env_file:
+      - path: .env
+        required: false
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8787/api/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
