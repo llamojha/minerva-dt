@@ -2,6 +2,10 @@
 
 Minerva runs on Vercel as **static site (CDN) + one serverless function for the API**, same-origin.
 
+> Prefer your own infrastructure? Minerva is also containerized — see
+> [`deploy/README.md`](deploy/README.md) for Docker, Kubernetes, and ECS Fargate. Unlike Vercel,
+> the container can run the **live agent** (it can spawn the MCP server subprocess).
+
 ## Layout
 
 | Path | Served by | Source |

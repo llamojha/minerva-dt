@@ -1,0 +1,26 @@
+node_modules
+dist
+.git
+.env
+.env.local
+.vercel
+.venv
+*.tsbuildinfo
+.DS_Store
+
+# Not needed at runtime
+demo
+demo-app
+docs
+gen
+video
+api
+.agents
+.claude
+.kiro
+.memory
+*.md
+hackathon-rules.md
+vercel.json
+.vercelignore
+skills-lock.json

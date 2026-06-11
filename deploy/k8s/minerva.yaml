@@ -1,0 +1,108 @@
+# Minerva — Kubernetes manifests (Deployment + Service).
+# Usage and prerequisites: see deploy/README.md.
+#
+# Replace REGISTRY/minerva:TAG with your pushed image. The app is stateless (the runId carries the
+# run's state), so multiple replicas are safe — no sticky sessions needed.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minerva
+  labels:
+    app: minerva
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: minerva
+  template:
+    metadata:
+      labels:
+        app: minerva
+    spec:
+      containers:
+        - name: minerva
+          image: REGISTRY/minerva:TAG
+          ports:
+            - name: http
+              containerPort: 8787
+          env:
+            - name: PORT
+              value: "8787"
+            # Fixture-backed demo by default. Set to "1" for the live agent — then the
+            # `minerva-live` Secret below must exist (see deploy/README.md).
+            - name: MINERVA_LIVE
+              value: "0"
+            # Optional: compress the fixture replay cadence (e.g. "3" = 3x faster).
+            - name: MINERVA_REPLAY_SPEED
+              value: "1"
+          # Live-mode credentials (DT_ENVIRONMENT, DT_PLATFORM_TOKEN, GOOGLE_CLOUD_PROJECT,
+          # GEMINI_API_KEY). `optional: true` keeps fixture-mode deploys working without it.
+          envFrom:
+            - secretRef:
+                name: minerva-live
+                optional: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              # Live mode (Gemini calls + the MCP server subprocess) wants the extra headroom;
+              # fixture mode runs comfortably far below this.
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false # npx (live mode) writes to the home dir cache
+            capabilities:
+              drop: ["ALL"]
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000 # the `node` user baked into the image
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minerva
+  labels:
+    app: minerva
+spec:
+  selector:
+    app: minerva
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+# Optional: Ingress (ingress-nginx shown). The investigation streams over SSE, so the proxy read
+# timeout must exceed the longest run (fixture replay is a few minutes at speed 1; live runs vary).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minerva
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: minerva.example.com # ← your hostname
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minerva
+                port:
+                  name: http
